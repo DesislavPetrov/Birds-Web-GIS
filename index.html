@@ -19,11 +19,13 @@
         <script>
             var map;
             var lyrOSM;
-            
-            
-            map = L.map('map', {center: [19,4, -99.2], zoom: 7});
-            lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
-            map.addLayer(lyrOSM);
+
+            $(document).ready(function(){
+                map = L.map('map', {center: [19,4, -99.2], zoom: 7});
+                lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
+                map.addLayer(lyrOSM);
+            })
+
         </script>
     </body>
 </html>
