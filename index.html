@@ -23,9 +23,12 @@
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7});
                 lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
-                map.addLayer(lyrOSM);
-            })
+                map.addLayer(lyrOSM);            
 
+                map.on('contextmenu', function(e){
+                    L.marker(e.latlng).addTo(map).bindPopup(e.latlng.toString());
+                })
+            })
         </script>
     </body>
 </html>
