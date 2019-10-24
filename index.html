@@ -15,7 +15,11 @@
     </head>
     <body>
         <div id="side-bar" class="col-md-3">
+            <button id="btnLocate" class="btn btn-primary btn-block">Locate</button>
+            <button id="btnZocalo" class="btn btn-primary btn-block">ZoomToZocalo</button>
             <h4>Zoom level: <span id="zoom-level"></span></h4>
+            <h4>Map center: <span id="map-center"></span></h4>
+            <h4>Mouse location: <span id="mouse-location"></span></h4>
         </div>
         <div id="map" class="col-md-9"></div>
         <script>
@@ -45,12 +49,33 @@
                     }
                     mrkCurrentLocation = L.circleMarker(e.latlng).addTo(map);
                     map.setView(e.latlng, 18);
-                })
+                });
 
                 map.on('zoomend', function(){
                     $("#zoom-level").html(map.getZoom());
-                })
-            })
+                });
+
+                map.on('moveend', function(){
+                    $("#map-center").html(LatLngToArrayString(map.getCenter()));
+                });
+
+                map.on('mousemove', function(e){
+                    $("#mouse-location").html(LatLngToArrayString(e.latlng));
+                });
+                
+                $("#btnLocate").click(function(){
+                    map.locate();
+                });
+                
+                $("#btnZocalo").click(function(){
+                    map.setView([19.43262, -99.13325], 17)
+                });
+            });
+            
+            function LatLngToArrayString(ll){
+                    console.log();
+                    return "[" + ll.lat.toFixed(5) + ", " + ll.lng.toFixed(5) + "]";
+                }
         </script>
     </body>
 </html>
