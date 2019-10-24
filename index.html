@@ -19,6 +19,7 @@
         <script>
             var map;
             var lyrOSM;
+            var mrkCurrentLocation;
 
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7});
@@ -27,6 +28,21 @@
 
                 map.on('contextmenu', function(e){
                     L.marker(e.latlng).addTo(map).bindPopup(e.latlng.toString());
+                })
+
+                map.on('keypress',function(e){
+                    if(e.originalEvent.key == "l"){
+                        map.locate();
+                    }
+                })
+
+                map.on('locationfound', function(e){
+                    console.log(e);
+                    if(mrkCurrentLocation){
+                        mrkCurrentLocation.remove();
+                    }
+                    mrkCurrentLocation = L.circleMarker(e.latlng).addTo(map);
+                    map.setView(e.latlng, 18);
                 })
             })
         </script>
