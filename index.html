@@ -14,7 +14,9 @@
         </style>
     </head>
     <body>
-        <div id="side-bar" class="col-md-3"></div>
+        <div id="side-bar" class="col-md-3">
+            <h4>Zoom level: <span id="zoom-level"></span></h4>
+        </div>
         <div id="map" class="col-md-9"></div>
         <script>
             var map;
@@ -43,6 +45,10 @@
                     }
                     mrkCurrentLocation = L.circleMarker(e.latlng).addTo(map);
                     map.setView(e.latlng, 18);
+                })
+
+                map.on('zoomend', function(){
+                    $("#zoom-level").html(map.getZoom());
                 })
             })
         </script>
