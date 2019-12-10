@@ -5,8 +5,10 @@
         <title>Birds Web GIS</title>
         <link rel="stylesheet" href="src/leaflet/leaflet.css">
         <link rel="stylesheet" href="src/css/bootstrap.css">
+        <link rel="stylesheet" href="plugins/Leaflet.Pancontrol/L.Control.Pan.css">
         <script src="src/leaflet/leaflet-src.js"></script>
         <script src="src/jquery/jquery-3.2.0.min.js"></script>
+        <script src="plugins/Leaflet.Pancontrol/L.Control.Pan.js"></script>
         <style>
             #map{
                 height: 100vh;
@@ -28,14 +30,27 @@
             var mrkCurrentLocation;
             var popZocalo;
             var ctlZoom;
+            var ctlAttribute;
+            var ctlScale;
+            var ctlPan;
 
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7, zoomControl: false, attributionControl: false});
                 lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
                 map.addLayer(lyrOSM); 
                 
+                ctlPan = L.control.pan().addTo(map);
+                
                 ctlZoom = L.control.zoom({zoomInText: "In", zoomOutText: "Out", position: "bottomright"});
                 ctlZoom.addTo(map);
+                
+                ctlAttribute = L.control.attribution({position: "bottomleft"});
+                ctlAttribute.addAttribution("OSM");
+                ctlAttribute.addAttribution('<a href= "http://geocadder.bg">geocadder</a>');
+                ctlAttribute.addTo(map);
+                
+                ctlScale = L.control.scale({position:"topleft"});
+                ctlScale.addTo(map);
                 
                 popZocalo = L.popup({maxWidth:200, keepInView:true});
                 popZocalo.setLatLng([19.43262, -99.13325]);
