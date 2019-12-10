@@ -7,10 +7,12 @@
         <link rel="stylesheet" href="src/css/bootstrap.css">
         <link rel="stylesheet" href="plugins/Leaflet.Pancontrol/L.Control.Pan.css">
         <link rel="stylesheet" href="plugins/Leaflet.Zoomslider/L.Control.Zoomslider.css">
+        <link rel="stylesheet" href="plugins/Leaflet.MousePosition/L.Control.MousePosition.css">
         <script src="src/leaflet/leaflet-src.js"></script>
         <script src="src/jquery/jquery-3.2.0.min.js"></script>
         <script src="plugins/Leaflet.Pancontrol/L.Control.Pan.js"></script>
         <script src="plugins/Leaflet.Zoomslider/L.Control.Zoomslider.js"></script>
+        <script src="plugins/Leaflet.MousePosition/L.Control.MousePosition.js"></script>
         <style>
             #map{
                 height: 100vh;
@@ -36,6 +38,7 @@
             var ctlScale;
             var ctlPan;
             var ctlZoomSlider;
+            var ctlMouseposition;
 
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7, zoomControl: false, attributionControl: false});
@@ -46,6 +49,8 @@
                 
                 ctlZoomSlider = L.control.zoomslider({position:"topleft"}).addTo(map);
                 
+                ctlMouseposition = L.control.mousePosition().addTo(map)
+;                
                 ctlZoom = L.control.zoom({zoomInText: "In", zoomOutText: "Out", position: "bottomright"});
                 ctlZoom.addTo(map);
                 
