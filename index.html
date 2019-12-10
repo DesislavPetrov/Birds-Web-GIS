@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="plugins/Leaflet.MousePosition/L.Control.MousePosition.css">
         <link rel="stylesheet" href="plugins/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css">
         <link rel="stylesheet" href="plugins/Leaflet.EasyButton/easy-button.css">
+        <link rel="stylesheet" href="plugins/Leaflet.Sidebar/L.Control.Sidebar.css">
         <script src="src/leaflet/leaflet-src.js"></script>
         <script src="src/jquery/jquery-3.2.0.min.js"></script>
         <script src="plugins/Leaflet.Pancontrol/L.Control.Pan.js"></script>
@@ -17,6 +18,7 @@
         <script src="plugins/Leaflet.MousePosition/L.Control.MousePosition.js"></script>
         <script src="plugins/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
         <script src="plugins/Leaflet.EasyButton/easy-button.js"></script>
+        <script src="plugins/Leaflet.Sidebar/L.Control.Sidebar.js"></script>
         <style>
             #map{
                 height: 100vh;
@@ -31,7 +33,7 @@
             <h4>Map center: <span id="map-center"></span></h4>
             <h4>Mouse location: <span id="mouse-location"></span></h4>
         </div>
-        <div id="map" class="col-md-9"></div>
+        <div id="map" class="col-md-12"></div>
         <script>
             var map;
             var lyrOSM;
@@ -45,6 +47,7 @@
             var ctlMouseposition;
             var ctlMeasure;
             var ctlEasyButton;
+            var ctlSidebar;
 
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7, zoomControl: false, attributionControl: false});
@@ -70,8 +73,12 @@
                 
                 ctlMeasure = L.control.polylineMeasure().addTo(map);
                 
-                ctlEasyButton = L.easyButton('glyphicon-screenshot', function(){
-                    map.locate()
+                ctlSidebar = L.control.sidebar('side-bar', {
+                    position: 'left'
+                }).addTo(map);
+                
+                ctlEasyButton = L.easyButton('glyphicon-transfer', function(){
+                    ctlSidebar.toggle();
                 }).addTo(map);
                 
                 popZocalo = L.popup({maxWidth:200, keepInView:true});
