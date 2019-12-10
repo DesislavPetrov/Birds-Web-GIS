@@ -9,12 +9,14 @@
         <link rel="stylesheet" href="plugins/Leaflet.Zoomslider/L.Control.Zoomslider.css">
         <link rel="stylesheet" href="plugins/Leaflet.MousePosition/L.Control.MousePosition.css">
         <link rel="stylesheet" href="plugins/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css">
+        <link rel="stylesheet" href="plugins/Leaflet.EasyButton/easy-button.css">
         <script src="src/leaflet/leaflet-src.js"></script>
         <script src="src/jquery/jquery-3.2.0.min.js"></script>
         <script src="plugins/Leaflet.Pancontrol/L.Control.Pan.js"></script>
         <script src="plugins/Leaflet.Zoomslider/L.Control.Zoomslider.js"></script>
         <script src="plugins/Leaflet.MousePosition/L.Control.MousePosition.js"></script>
         <script src="plugins/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
+        <script src="plugins/Leaflet.EasyButton/easy-button.js"></script>
         <style>
             #map{
                 height: 100vh;
@@ -42,6 +44,7 @@
             var ctlZoomSlider;
             var ctlMouseposition;
             var ctlMeasure;
+            var ctlEasyButton;
 
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7, zoomControl: false, attributionControl: false});
@@ -66,6 +69,10 @@
                 ctlScale.addTo(map);
                 
                 ctlMeasure = L.control.polylineMeasure().addTo(map);
+                
+                ctlEasyButton = L.easyButton('glyphicon-screenshot', function(){
+                    map.locate()
+                }).addTo(map);
                 
                 popZocalo = L.popup({maxWidth:200, keepInView:true});
                 popZocalo.setLatLng([19.43262, -99.13325]);
