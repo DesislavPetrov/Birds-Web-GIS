@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="plugins/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css">
         <link rel="stylesheet" href="plugins/Leaflet.EasyButton/easy-button.css">
         <link rel="stylesheet" href="plugins/Leaflet.Sidebar/L.Control.Sidebar.css">
+        <link rel="stylesheet" href="plugins/Leaflet.OpenCage.Search/css/L.Control.OpenCageSearch.css">
         <script src="src/leaflet/leaflet-src.js"></script>
         <script src="src/jquery/jquery-3.2.0.min.js"></script>
         <script src="plugins/Leaflet.Pancontrol/L.Control.Pan.js"></script>
@@ -19,6 +20,7 @@
         <script src="plugins/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
         <script src="plugins/Leaflet.EasyButton/easy-button.js"></script>
         <script src="plugins/Leaflet.Sidebar/L.Control.Sidebar.js"></script>
+        <script src="plugins/Leaflet.OpenCage.Search/js/L.Control.OpenCageSearch.js"></script>
         <style>
             #map{
                 height: 100vh;
@@ -48,6 +50,7 @@
             var ctlMeasure;
             var ctlEasyButton;
             var ctlSidebar;
+            var ctlSearch;
 
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7, zoomControl: false, attributionControl: false});
@@ -67,6 +70,8 @@
                 ctlAttribute.addAttribution("OSM");
                 ctlAttribute.addAttribution('<a href= "http://geocadder.bg">geocadder</a>');
                 ctlAttribute.addTo(map);
+                
+                ctlSearch = L.Control.openCageSearch({key:"1ecacf64368d4930bd6e4e6ceadba65c"}).addTo(map);
                 
                 ctlScale = L.control.scale({position:"topleft"});
                 ctlScale.addTo(map);
