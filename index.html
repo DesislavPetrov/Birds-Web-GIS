@@ -21,6 +21,7 @@
         <script src="plugins/Leaflet.EasyButton/easy-button.js"></script>
         <script src="plugins/Leaflet.Sidebar/L.Control.Sidebar.js"></script>
         <script src="plugins/Leaflet.OpenCage.Search/js/L.Control.OpenCageSearch.js"></script>
+        <script src="plugins/Leaflet.Providers/leaflet-providers.js"></script>
         <style>
             #map{
                 height: 100vh;
@@ -39,6 +40,10 @@
         <script>
             var map;
             var lyrOSM;
+            var lyrTopo;
+            var lyrImagery;
+            var lyrOutdoors;
+            var lyrWatercolor;
             var mrkCurrentLocation;
             var popZocalo;
             var ctlZoom;
@@ -51,11 +56,31 @@
             var ctlEasyButton;
             var ctlSidebar;
             var ctlSearch;
+            var ctlLayers;
+            var objBasemaps;
+            var objLayers;
 
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7, zoomControl: false, attributionControl: false});
-                lyrOSM = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png');
-                map.addLayer(lyrOSM); 
+                lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
+                lyrTopo = L.tileLayer.provider('OpenTopoMap');
+                lyrImagery = L.tileLayer.provider('Esri.WorldImagery');
+                lyrOutdoors = L.tileLayer.provider('Thunderforest.Outdoors');
+                lyrWatercolor = L.tileLayer.provider('Stamen.Watercolor'); 
+                
+                map.addLayer(lyrOSM);
+                
+                objBasemaps = {
+                    "Open Street Maps": lyrOSM,
+                    "Topo Map": lyrTopo,
+                    "Imagery": lyrImagery,
+                    "Outdoors": lyrOutdoors,
+                    "Watercolor": lyrWatercolor
+                }
+                
+                objLayers = {};
+                
+                ctlLayers = L.control.layers(objBasemaps, objLayers).addTo(map);
                 
                 ctlPan = L.control.pan().addTo(map);
                 
