@@ -35,6 +35,8 @@
             <h4>Zoom level: <span id="zoom-level"></span></h4>
             <h4>Map center: <span id="map-center"></span></h4>
             <h4>Mouse location: <span id="mouse-location"></span></h4>
+            <h4>Image Opacity: <span id="image-opacity">0.5</span></h4>
+            <input type="range" id="sldOpacity" min="0" max="1" step="0.1" value="0.5">
         </div>
         <div id="map" class="col-md-12"></div>
         <script>
@@ -159,6 +161,11 @@
                     map.setView([19.43262, -99.13325], 17);
                     map.openPopup(popZocalo);
                 });
+                
+                $("#sldOpacity").on("change", function(){
+                    $("#image-opacity").html(this.value);
+                    lyrChapultepec.setOpacity(this.value);
+                })
             });
             
             function LatLngToArrayString(ll){
