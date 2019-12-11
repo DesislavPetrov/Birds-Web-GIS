@@ -44,6 +44,7 @@
             var lyrImagery;
             var lyrOutdoors;
             var lyrWatercolor;
+            var lyrChapultepec;
             var mrkCurrentLocation;
             var popZocalo;
             var ctlZoom;
@@ -58,7 +59,7 @@
             var ctlSearch;
             var ctlLayers;
             var objBasemaps;
-            var objLayers;
+            var objOverlays;
 
             $(document).ready(function(){
                 map = L.map('map', {center: [19,4, -99.2], zoom: 7, zoomControl: false, attributionControl: false});
@@ -78,9 +79,13 @@
                     "Watercolor": lyrWatercolor
                 }
                 
-                objLayers = {};
+                lyrChapultepec = L.imageOverlay('img/chapultepec.png', [[19.42993, -99.20843], [19.40621, -99.17453]],{opacity: 0.5}).addTo(map);
                 
-                ctlLayers = L.control.layers(objBasemaps, objLayers).addTo(map);
+                objOverlays = {
+                    "Chapultepec Image": lyrChapultepec
+                };
+                
+                ctlLayers = L.control.layers(objBasemaps, objOverlays).addTo(map);
                 
                 ctlPan = L.control.pan().addTo(map);
                 
