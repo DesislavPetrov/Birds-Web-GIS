@@ -33,6 +33,7 @@
             <button id="btnLocate" class="btn btn-primary btn-block">Locate</button>
             <button id="btnMuseo" class="btn btn-primary btn-block">Zoom to Anthropology Museum</button>
              <button id="btnZocalo" class="btn btn-primary btn-block">ZoomToZocalo</button>
+             <button id="btnBikeRoute" class="btn btn-primary btn-block">Zoom to Bike Route</button>
             <h4>Zoom level: <span id="zoom-level"></span></h4>
             <h4>Map center: <span id="map-center"></span></h4>
             <h4>Mouse location: <span id="mouse-location"></span></h4>
@@ -177,6 +178,10 @@
                 $("#btnMuseo").click(function(){
                     map.setView([19.42596, -99.18620], 17);
                     mrkMuseo.setLatLng([19.42596, -99.18620]);                    mrkMuseo.setTooltipContent("Anthropology Museum");
+                });
+                
+                $("#btnBikeRoute").click(function(){
+                    map.fitBounds(plnBikeRoute.getBounds());
                 });
                 
                 $("#sldOpacity").on("change", function(){
