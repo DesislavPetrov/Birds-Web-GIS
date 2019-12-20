@@ -32,8 +32,10 @@
         <div id="side-bar" class="col-md-3">
             <button id="btnLocate" class="btn btn-primary btn-block">Locate</button>
             <button id="btnMuseo" class="btn btn-primary btn-block">Zoom to Anthropology Museum</button>
-             <button id="btnZocalo" class="btn btn-primary btn-block">ZoomToZocalo</button>
-             <button id="btnBikeRoute" class="btn btn-primary btn-block">Zoom to Bike Route</button>
+            <button id="btnZocalo" class="btn btn-primary btn-block">ZoomToZocalo</button>
+            <button id="btnBikeRoute" class="btn btn-primary btn-block">Zoom to Bike Route</button>
+            <button id="btnAddMuseo" class="btn btn-primary btn-block">Add Museum to Vector Group</button>
+            <button id="btnColor" class="btn btn-primary btn-block">Change Color</button>
             <h4>Zoom level: <span id="zoom-level"></span></h4>
             <h4>Map center: <span id="map-center"></span></h4>
             <h4>Mouse location: <span id="mouse-location"></span></h4>
@@ -53,6 +55,7 @@
             var mrkMuseo;
             var plnBikeRoute;
             var plyParks;
+            var fgpChapultepec;
             var popZocalo;
             var ctlZoom;
             var ctlAttribute;
@@ -75,9 +78,9 @@
                 lyrImagery = L.tileLayer.provider('Esri.WorldImagery');
                 lyrOutdoors = L.tileLayer.provider('Thunderforest.Outdoors');
                 lyrWatercolor = L.tileLayer.provider('Stamen.Watercolor'); 
-                
+
                 map.addLayer(lyrOSM);
-                
+
                 objBasemaps = {
                     "Open Street Maps": lyrOSM,
                     "Topo Map": lyrTopo,
@@ -85,60 +88,59 @@
                     "Outdoors": lyrOutdoors,
                     "Watercolor": lyrWatercolor
                 }
-                
+
                 lyrChapultepec = L.imageOverlay('img/chapultepec.png', [[19.42993, -99.20843], [19.40621, -99.17453]],{opacity: 0.5}).addTo(map);
-                
-                mrkMuseo = L.marker([19.42596, -99.1862], {draggable: true}).addTo(map);
+
+                mrkMuseo = L.marker([19.42596, -99.1862], {draggable: true});
                 mrkMuseo.bindTooltip("Anthropology Museum");
-                
-                
-                plyParks = L.polygon([[[[19.4068, -99.2015], [19.4166, -99.1803], [19.4299, -99.1825], [19.4191, -99.2056]], 
-[[19.4216, -99.1853], [19.4217, -99.1843], [19.4241, -99.1848], [19.4245, -99.1872]]], [[[19.4042, -99.1895], [19.405, -99.1884], [19.4076, -99.1898], [19.4055, -99.1909]]]], {color:"red", fillColor:"yellow", fillOpacity: 0.8}).addTo(map);
-                
+
+
+                plyParks = L.polygon([[[[19.4068, -99.2015], [19.4166, -99.1803], [19.4299, -99.1825], [19.4191, -99.2056]], [[19.4216, -99.1853], [19.4217, -99.1843], [19.4241, -99.1848], [19.4245, -99.1872]]], [[[19.4042, -99.1895], [19.405, -99.1884], [19.4076, -99.1898], [19.4055, -99.1909]]]], {color:"red", fillColor:"yellow", fillOpacity: 0.8}).addTo(map);
+
                 plnBikeRoute = L.polyline([[[19.4138, -99.1876], [19.4167, -99.188], [19.4165, -99.1873], [19.4214, -99.1872], [19.4215, -99.1841], [19.4258, -99.1843], [19.4259, -99.1852]], [[19.4215, -99.1865], [19.4251, -99.1881], [19.4246, -99.1843]]], {color:"red"}).addTo(map);
-                
+
+                fgpChapultepec = L.featureGroup([plnBikeRoute, plyParks]).addTo(map);
+
                 objOverlays = {
                     "Chapultepec Image": lyrChapultepec,
-                    "Museum of Anthropology": mrkMuseo,
-                    "Bike Route to Museum": plnBikeRoute,
-                    "Parks": plyParks
+                    "Chapultepec Vectors": fgpChapultepec
                 };
-                
+
                 ctlLayers = L.control.layers(objBasemaps, objOverlays).addTo(map);
-                
+
                 ctlPan = L.control.pan().addTo(map);
-                
+
                 ctlZoomSlider = L.control.zoomslider({position:"topleft"}).addTo(map);
-                
+
                 ctlMouseposition = L.control.mousePosition().addTo(map)
-;                
+                ;                
                 ctlZoom = L.control.zoom({zoomInText: "In", zoomOutText: "Out", position: "bottomright"});
                 ctlZoom.addTo(map);
-                
+
                 ctlAttribute = L.control.attribution({position: "bottomleft"});
                 ctlAttribute.addAttribution("OSM");
                 ctlAttribute.addAttribution('<a href= "http://geocadder.bg">geocadder</a>');
                 ctlAttribute.addTo(map);
-                
+
                 ctlSearch = L.Control.openCageSearch({key:"1ecacf64368d4930bd6e4e6ceadba65c"}).addTo(map);
-                
+
                 ctlScale = L.control.scale({position:"topleft"});
                 ctlScale.addTo(map);
-                
+
                 ctlMeasure = L.control.polylineMeasure().addTo(map);
-                
+
                 ctlSidebar = L.control.sidebar('side-bar', {
                     position: 'left'
                 }).addTo(map);
-                
+
                 ctlEasyButton = L.easyButton('glyphicon-transfer', function(){
                     ctlSidebar.toggle();
                 }).addTo(map);
-                
+
                 popZocalo = L.popup({maxWidth:200, keepInView:true});
                 popZocalo.setLatLng([19.43262, -99.13325]);
                 popZocalo.setContent("<h4>Zocalo</h4><img src='img/zocalo.jpg' width='200px'>");
-                
+
 
                 map.on('contextmenu', function(e){
                     L.marker(e.latlng).addTo(map).bindPopup(e.latlng.toString());
@@ -170,39 +172,54 @@
                 map.on('mousemove', function(e){
                     $("#mouse-location").html(LatLngToArrayString(e.latlng));
                 });
-                
+
                 mrkMuseo.on("dragend", function(){
                     mrkMuseo.setTooltipContent("Current location: " + mrkMuseo.getLatLng().toString() + "<br>" + "Distance to Anthropology Museum: " + mrkMuseo.getLatLng().distanceTo([19.42596, -99.18620]).toFixed(0))
                 });
-                
+
                 $("#btnLocate").click(function(){
                     map.locate();
                 });
-                
+
                 $("#btnZocalo").click(function(){
                     map.setView([19.43262, -99.13325], 17);
                     map.openPopup(popZocalo);
                 });
-                
+
                 $("#btnMuseo").click(function(){
                     map.setView([19.42596, -99.18620], 17);
                     mrkMuseo.setLatLng([19.42596, -99.18620]);                    mrkMuseo.setTooltipContent("Anthropology Museum");
                 });
-                
+
                 $("#btnBikeRoute").click(function(){
                     map.fitBounds(plnBikeRoute.getBounds());
                 });
-                
+
                 $("#sldOpacity").on("change", function(){
                     $("#image-opacity").html(this.value);
                     lyrChapultepec.setOpacity(this.value);
                 })
+                
+                $("#btnColor").click(function(){
+                    fgpChapultepec.setStyle({color: 'purple', fillColor: 'green', fillOpacity: 0.8})
+                })
+
+                $("#btnAddMuseo").click(function(){
+                    if(fgpChapultepec.hasLayer(mrkMuseo)){
+                        fgpChapultepec.removeLayer(mrkMuseo);
+                        $("#btnAddMuseo").html("Add Museo From Chapultepec Vectors");
+                    }
+                    else {
+                        fgpChapultepec.addLayer(mrkMuseo);
+                        $("#btnAddMuseo").html("Remove Museo From Chapultepec Vectors");
+                    }
+                });
             });
-            
+
             function LatLngToArrayString(ll){
-                    console.log();
-                    return "[" + ll.lat.toFixed(5) + ", " + ll.lng.toFixed(5) + "]";
-                }
+                console.log();
+                return "[" + ll.lat.toFixed(5) + ", " + ll.lng.toFixed(5) + "]";
+            }
         </script>
     </body>
 </html>
