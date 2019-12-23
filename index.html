@@ -26,6 +26,7 @@
         <script src="src/plugins/leaflet-styleeditor/javascript/Leaflet.StyleEditor.js"></script>
         <script src="src/plugins/leaflet-styleeditor/javascript/Leaflet.StyleForms.js"></script>
         <script src="src/plugins/leaflet.ajax.min.js"></script>
+        <script src="src/plugins/leaflet.sprite.js"></script>
 
         <!--    ***************  Begin Leaflet.Draw-->
 
@@ -104,8 +105,12 @@
             var ctlStyle;
             var objBasemaps;
             var objOverlays;
+            var icnRedSprite;
+            var icnVioletSprite;
 
             $(document).ready(function(){
+                icnRedSprite = L.spriteIcon("red");
+                icnVioletSprite = L.spriteIcon("violet");
                 map = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionControl:false});
                 lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
                 lyrTopo = L.tileLayer.provider('OpenTopoMap');
@@ -223,12 +228,21 @@
 
             function returnEagleMarker(json, latlng){
                 var att = json.properties;
+                
                 if(att.status == "ACTIVE NEST"){
+                    var icnEagle = icnRedSprite;
+                } else {
+                    var icnEagle = icnVioletSprite;
+                }
+                
+                return L.marker(latlng, {icon: icnEagle});
+                
+               /* if(att.status == "ACTIVE NEST"){
                     var clrNest = "deeppink";
                 } else {
                     var clrNest = "green";
                 }
-                return L.circle(latlng, {radius:804, color:clrNest, fillColor: 'green', fillOpacity: 0.5}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status)
+                return L.circle(latlng, {radius:804, color:clrNest, fillColor: 'green', fillOpacity: 0.5}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status)*/
             }
 
             function returnRaptorMarker (json, latlng){
