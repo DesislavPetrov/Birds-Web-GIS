@@ -124,7 +124,7 @@
                 fgpDrawnItems = new L.FeatureGroup();
                 fgpDrawnItems.addTo(map);
                 
-                lyrEagleNests = L.geoJSON.ajax("data/wildlife_eagle.geojson", {pointToLayer:returnEagleMarker}).addTo(map);
+                lyrEagleNests = L.geoJSON.ajax("data/wildlife_eagle.geojson", {pointToLayer:returnEagleMarker, filter: filterEagleNests}).addTo(map);
                 lyrEagleNests.on("data:loaded", function(){
                     map.fitBounds(lyrEagleNests.getBounds());
                 })
@@ -139,7 +139,6 @@
                 ctlLayers = L.control.layers(objBasemaps, objOverlays).addTo(map);
 
                 ctlPan = L.control.pan().addTo(map);
-                /*ctlZoomslider = L.control.zoomslider({position:'topright'}).addTo(map);*/
 
                 ctlMeasure = L.control.polylineMeasure().addTo(map);
                 ctlSidebar = L.control.sidebar('side-bar').addTo(map);
@@ -222,7 +221,21 @@
             
             function returnEagleMarker(json, latlng){
                 var att = json.properties;
-                return L.circleMarker(latlng, {radius:10, color:'deeppink'}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status)
+                if(att.status == "ACTIVE NEST"){
+                    var clrNest = "deeppink"
+                } else {
+                    clrNest = "lightblue"
+                }
+                return L.circleMarker(latlng, {radius:10, color:clrNest}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status)
+            }
+            
+            function filterEagleNests(json){
+                var att = json.properties;
+                if(att.status = "ACTIVE NEST"){
+                    return true
+                } else {
+                    return false
+                }
             }
 
         </script>
