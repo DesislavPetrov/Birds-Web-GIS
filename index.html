@@ -228,23 +228,34 @@
                 } else {
                     var clrNest = "green";
                 }
-                return L.circleMarker(latlng, {radius:10, color:clrNest, fillColor: 'green', fillOpacity: 0.5}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status)
+                return L.circle(latlng, {radius:804, color:clrNest, fillColor: 'green', fillOpacity: 0.5}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status)
             }
 
             function returnRaptorMarker (json, latlng){
                 var att = json.properties;
-                switch(att.recentstatus){
-                    case 'ACTIVE NEST':
-                        var optRaptor = {radius: 10, color: "deeppink", fillColor: "blue", fillOpacity: 0.5};
+                switch (att.recentspecies){
+                    case "Red-tail Hawk":
+                        var radRaptor = 533;
                         break;
-                    case "INACTIVE NEST":
-                        var optRaptor = {radius: 10, color: "blue", fillColor: "blue", fillOpacity: 0.5};
+                    case "Swainsons Hawk": 
+                        var radRaptor = 400;
                         break;
-                    case "FLEDGED NEST":
-                        var optRaptor = {radius: 10, color: "deeppink", fillColor: "blue", fillOpacity: 0.5, dashArray: "2.8"};
+                    default: 
+                        var radRaptor = 804;
                         break;
                 }
-                return L.circleMarker(latlng, optRaptor).bindPopup("<h4>Raptor Nest: " + att.Nest_ID + "</h4>Status: " + att.recentstatus + "</br>Species: " + att.recentspecies + "</br>Last Survey: " + att.lastsurvey);
+                switch(att.recentstatus){
+                    case 'ACTIVE NEST':
+                        var optRaptor = {radius: radRaptor, color: "deeppink", fillColor: "blue", fillOpacity: 0.5};
+                        break;
+                    case "INACTIVE NEST":
+                        var optRaptor = {radius: radRaptor, color: "blue", fillColor: "blue", fillOpacity: 0.5};
+                        break;
+                    case "FLEDGED NEST":
+                        var optRaptor = {radius: radRaptor, color: "deeppink", fillColor: "blue", fillOpacity: 0.5, dashArray: "2.8"};
+                        break;
+                }
+                return L.circle(latlng, optRaptor).bindPopup("<h4>Raptor Nest: " + att.Nest_ID + "</h4>Status: " + att.recentstatus + "</br>Species: " + att.recentspecies + "</br>Last Survey: " + att.lastsurvey);
             }
 
         </script>
