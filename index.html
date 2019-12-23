@@ -18,6 +18,8 @@
         <link rel="stylesheet" href="src/plugins/leaflet-styleeditor/css/Leaflet.StyleEditor.css">
         <link rel="stylesheet" href="src/css/font-awesome.min.css">
         <link rel="stylesheet" href="src/plugins/leaflet.awesome-markers.css">
+        <link rel="stylesheet" href="src/plugins/leaflet-mapkey/MapkeyIcons.css">
+        <link rel="stylesheet" href="src/plugins/leaflet-mapkey/L.Icon.Mapkey.css">
 
         <script src="src/leaflet-src.js"></script>
         <script src="src/jquery-3.2.0.min.js"></script>
@@ -34,6 +36,7 @@
         <script src="src/plugins/leaflet.ajax.min.js"></script>
         <script src="src/plugins/leaflet.sprite.js"></script>
         <script src="src/plugins/leaflet.awesome-markers.min.js"></script>
+        <script src="src/plugins/leaflet-mapkey/L.Icon.Mapkey.js"></script>
 
         <!--    ***************  Begin Leaflet.Draw-->
 
@@ -116,6 +119,8 @@
             var icnVioletSprite;
             var icnAMtree;
             var icnAMbird;
+            var icnMKtree;
+            var icnMKbird;
 
             $(document).ready(function(){
                 icnRedSprite = L.spriteIcon("red");
@@ -123,6 +128,9 @@
                 
                 icnAMtree = L.AwesomeMarkers.icon({icon:"tree-conifer", markerColor:"green"});
                 icnAMbird = L.AwesomeMarkers.icon({icon:"twitter", markerColor:"green", prefix:"fa", iconColor: "#FF0000"});
+                
+                icnMKbird = L.icon.mapkey({icon:"school", color:"#880000", background:"green"});
+                icnMKtree = L.icon.mapkey({icon:"tree_cinofer", color:"#880000", background:"#00FF00", size:50, borderRadius:5});
                 
                 map = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionControl:false});
                 lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
@@ -243,9 +251,9 @@
                 var att = json.properties;
 
                 if(att.status == "ACTIVE NEST"){
-                    var icnEagle = icnAMbird;
+                    var icnEagle = icnMKbird;
                 } else {
-                    var icnEagle = icnAMtree;
+                    var icnEagle = icnMKtree;
                 }
 
                 return L.marker(latlng, {icon: icnEagle});
