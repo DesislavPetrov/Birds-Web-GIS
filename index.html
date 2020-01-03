@@ -20,6 +20,8 @@
         <link rel="stylesheet" href="src/plugins/leaflet.awesome-markers.css">
         <link rel="stylesheet" href="src/plugins/leaflet-mapkey/MapkeyIcons.css">
         <link rel="stylesheet" href="src/plugins/leaflet-mapkey/L.Icon.Mapkey.css">
+        <link rel="stylesheet" href="src/plugins/MarkerCluster.css">
+        <link rel="stylesheet" href="src/plugins/MarkerCluster.Default.css">
 
         <script src="src/leaflet-src.js"></script>
         <script src="src/jquery-3.2.0.min.js"></script>
@@ -37,6 +39,7 @@
         <script src="src/plugins/leaflet.sprite.js"></script>
         <script src="src/plugins/leaflet.awesome-markers.min.js"></script>
         <script src="src/plugins/leaflet-mapkey/L.Icon.Mapkey.js"></script>
+        <script src="src/plugins/leaflet.markercluster-src.js"></script>
 
         <!--    ***************  Begin Leaflet.Draw-->
 
@@ -98,6 +101,7 @@
             var lyrOutdoors;
             var lyrEagleNests;
             var lyrRaptorNests;
+            var lyrMarkerCluster;
             var mrkCurrentLocation;
             var fgpDrawnItems;
             var popZocalo;
@@ -115,27 +119,10 @@
             var ctlStyle;
             var objBasemaps;
             var objOverlays;
-            var icnRedSprite;
-            var icnVioletSprite;
-            var icnAMtree;
-            var icnAMbird;
-            var icnMKtree;
-            var icnMKbird;
-            var icnEagleActive;
-            var icnEagleInactive;
+            
 
             $(document).ready(function(){
-                icnRedSprite = L.spriteIcon("red");
-                icnVioletSprite = L.spriteIcon("violet");
                 
-                icnAMtree = L.AwesomeMarkers.icon({icon:"tree-conifer", markerColor:"green"});
-                icnAMbird = L.AwesomeMarkers.icon({icon:"twitter", markerColor:"green", prefix:"fa", iconColor: "#FF0000"});
-                
-                icnMKbird = L.icon.mapkey({icon:"school", color:"#880000", background:"green"});
-                icnMKtree = L.icon.mapkey({icon:"tree_cinofer", color:"#880000", background:"#00FF00", size:50, borderRadius:5});
-                
-                icnEagleActive = L.icon({iconUrl:'img/nest2.png', iconSize:[40,40], iconAnchor:[20,24]});
-                icnEagleInactive = L.icon({iconUrl:'img/nest.png', iconSize:[40,40], iconAnchor:[20,24]});
                 
                 map = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionControl:false});
                 lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
@@ -157,17 +144,21 @@
                 fgpDrawnItems.addTo(map);
 
                 lyrEagleNests = L.geoJSON.ajax("data/wildlife_eagle.geojson", {pointToLayer:returnEagleMarker}).addTo(map);
-                lyrEagleNests.on("data:loaded", function(){
+                lyrEagleNests.on("data:loaded", function(){                    
                     map.fitBounds(lyrEagleNests.getBounds());
                 })
+                
+                lyrMarkerCluster = L.markerClusterGroup();
 
                 lyrRaptorNests = L.geoJSON.ajax("data/wildlife_raptor.geojson", {pointToLayer:returnRaptorMarker}).addTo(map);
                 lyrRaptorNests.on("data:loaded", function(){
+                    lyrMarkerCluster.addLayer(lyrRaptorNests);                                                           
+                    lyrMarkerCluster.addTo(map);
                 })
 
                 objOverlays = {
                     "Raptor Nest": lyrRaptorNests,
-                    "Eagle Nest": lyrEagleNests,
+                    "Eagle Nest": lyrMarkerCluster,
                     "Drawn Items":fgpDrawnItems
                 };
 
@@ -258,19 +249,11 @@
                 var att = json.properties;
 
                 if(att.status == "ACTIVE NEST"){
-                    var icnEagle = icnEagleActive;
-                } else {
-                    var icnEagle = icnEagleInactive;
-                }
-
-                return L.marker(latlng, {icon: icnEagle}).bindTooltip("<h4>Eagle Nest: " + att.nest_id +"</h4>");
-
-                /* if(att.status == "ACTIVE NEST"){
                     var clrNest = "deeppink";
                 } else {
                     var clrNest = "green";
                 }
-                return L.circle(latlng, {radius:804, color:clrNest, fillColor: 'green', fillOpacity: 0.5}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status)*/
+                return L.circle(latlng, {radius:804, color:clrNest, fillColor: 'green', fillOpacity: 0.5}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status);
             }
 
             function returnRaptorMarker (json, latlng){
