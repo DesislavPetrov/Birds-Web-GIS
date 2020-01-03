@@ -121,6 +121,8 @@
             var icnAMbird;
             var icnMKtree;
             var icnMKbird;
+            var icnEagleActive;
+            var icnEagleInactive;
 
             $(document).ready(function(){
                 icnRedSprite = L.spriteIcon("red");
@@ -131,6 +133,9 @@
                 
                 icnMKbird = L.icon.mapkey({icon:"school", color:"#880000", background:"green"});
                 icnMKtree = L.icon.mapkey({icon:"tree_cinofer", color:"#880000", background:"#00FF00", size:50, borderRadius:5});
+                
+                icnEagleActive = L.icon({iconUrl:'img/nest2.png', iconSize:[40,40], iconAnchor:[20,24]});
+                icnEagleInactive = L.icon({iconUrl:'img/nest.png', iconSize:[40,40], iconAnchor:[20,24]});
                 
                 map = L.map('mapdiv', {center:[19.4, -99.2], zoom:13, zoomControl:false, attributionControl:false});
                 lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
@@ -200,7 +205,9 @@
                 map.on('draw:created', function(e){
                     console.log(e);
                     fgpDrawnItems.addLayer(e.layer);
-                });map.on('contextmenu', function(e) {
+                });
+                
+                map.on('contextmenu', function(e) {
                     var dtCurrentTime = new Date();
                     L.marker(e.latlng).addTo(map).bindPopup(e.latlng.toString()+"<br>"+dtCurrentTime.toString());
                 });
@@ -251,12 +258,12 @@
                 var att = json.properties;
 
                 if(att.status == "ACTIVE NEST"){
-                    var icnEagle = icnMKbird;
+                    var icnEagle = icnEagleActive;
                 } else {
-                    var icnEagle = icnMKtree;
+                    var icnEagle = icnEagleInactive;
                 }
 
-                return L.marker(latlng, {icon: icnEagle});
+                return L.marker(latlng, {icon: icnEagle}).bindTooltip("<h4>Eagle Nest: " + att.nest_id +"</h4>");
 
                 /* if(att.status == "ACTIVE NEST"){
                     var clrNest = "deeppink";
