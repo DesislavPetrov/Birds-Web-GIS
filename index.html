@@ -101,6 +101,7 @@
             var lyrOutdoors;
             var lyrEagleNests;
             var lyrRaptorNests;
+            var lyrClientLines;
             var lyrMarkerCluster;
             var mrkCurrentLocation;
             var fgpDrawnItems;
@@ -155,8 +156,11 @@
                     lyrMarkerCluster.addLayer(lyrRaptorNests);                                                           
                     lyrMarkerCluster.addTo(map);
                 })
+                
+                lyrClientLines = L.geoJSON.ajax('data/client_lines.geojson', {style:styleClientLinears, onEachFeature:processClientLinears}).addTo(map);
 
                 objOverlays = {
+                    "Client Linears": lyrClientLines,
                     "Raptor Nest": lyrRaptorNests,
                     "Eagle Nest": lyrMarkerCluster,
                     "Drawn Items":fgpDrawnItems
@@ -281,6 +285,41 @@
                         break;
                 }
                 return L.circle(latlng, optRaptor).bindPopup("<h4>Raptor Nest: " + att.Nest_ID + "</h4>Status: " + att.recentstatus + "</br>Species: " + att.recentspecies + "</br>Last Survey: " + att.lastsurvey);
+            }
+            
+            function styleClientLinears(json){
+                var att = json.properties;
+                switch(att.type){
+                    case 'Pipeline':
+                        return {color:'peru'};
+                        break;
+                     case 'Flowline':
+                        return {color:'navy'};
+                        break;    
+                      case 'Flowline, est.':
+                        return {color:'navy', dashArray:"5.5"};
+                        break;   
+                    case 'Electric line':
+                        return {color:'darkgreen'};
+                        break; 
+                    case 'Access Road - Confirmed':
+                        return {color:'darkgreen'};
+                        break;   
+                    case 'Access Road - Estimated':
+                        return {color:'darkred', dashArray:"5.5"};
+                        break;  
+                    case 'Extraction':
+                        return {color:'indigo'};
+                        break;
+                    default:
+                        return {color:'darkgoldenrod'}
+                        break;
+                }
+            }
+            
+            function processClientLinears(json, lyr){
+                var att = json.properties;
+                lyr.bindTooltip("<h4>Linear Project: " + att.Project + "</h4>Type: " + att.type + "</br>Row Width: " + att.row_width);
             }
 
         </script>
