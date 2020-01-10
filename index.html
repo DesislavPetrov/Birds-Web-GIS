@@ -102,6 +102,7 @@
             var lyrEagleNests;
             var lyrRaptorNests;
             var lyrClientLines;
+            var lyrBUOWL;
             var lyrMarkerCluster;
             var mrkCurrentLocation;
             var fgpDrawnItems;
@@ -157,10 +158,15 @@
                     lyrMarkerCluster.addTo(map);
                 })
                 
+                // added MultiLineString data
                 lyrClientLines = L.geoJSON.ajax('data/client_lines.geojson', {style:styleClientLinears, onEachFeature:processClientLinears}).addTo(map);
+                
+                // adding MultiPolygon data
+                lyrBUOWL = L.geoJSON.ajax('data/wildlife_buowl.geojson', {style: styleBUOWL, onEachFeature:processBUOWL, filter:filterBUOWL}).addTo(map);
 
                 objOverlays = {
                     "Client Linears": lyrClientLines,
+                    "Burrowing Owl Habitat": lyrBUOWL,
                     "Raptor Nest": lyrRaptorNests,
                     "Eagle Nest": lyrMarkerCluster,
                     "Drawn Items":fgpDrawnItems
@@ -320,6 +326,32 @@
             function processClientLinears(json, lyr){
                 var att = json.properties;
                 lyr.bindTooltip("<h4>Linear Project: " + att.Project + "</h4>Type: " + att.type + "</br>Row Width: " + att.row_width);
+            }
+            
+            function styleBUOWL (json){
+                var att = json.properties;
+                switch(att.hist_occup){
+                    case 'Yes':
+                        return {color:'deeppink', fillColor:'yellow'};
+                        break;
+                    case 'Undetermined':
+                        return {color:'yellow'};
+                        break;
+                }
+            }
+            
+            function processBUOWL (json, lyr){
+                var att = json.properties;
+                lyr.bindTooltip("<h4>Habitat ID: " + att.habitat_id + "</h4>Historically Occupied:" + att.hist_occup + "<br>Status: " + att.recentstatus);
+            }
+            
+            function filterBUOWL(json){
+                var att = json.properties;
+                if(att.recentStatus=='REMOVED'){
+                    return false;
+                } else {
+                    return true;
+                }
             }
 
         </script>
