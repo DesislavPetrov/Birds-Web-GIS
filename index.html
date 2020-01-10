@@ -103,6 +103,7 @@
             var lyrRaptorNests;
             var lyrClientLines;
             var lyrBUOWL;
+            var lyrGBH;
             var lyrMarkerCluster;
             var mrkCurrentLocation;
             var fgpDrawnItems;
@@ -163,11 +164,14 @@
                 
                 // adding MultiPolygon data
                 lyrBUOWL = L.geoJSON.ajax('data/wildlife_buowl.geojson', {style: styleBUOWL, onEachFeature:processBUOWL, filter:filterBUOWL}).addTo(map);
+                
+                lyrGBH = L.geoJSON.ajax('data/wildlife_gbh.geojson', {style:{color:'fuchsia'}}).bindTooltip("GBH Nesting Area").addTo(map);
 
                 objOverlays = {
                     "Client Linears": lyrClientLines,
                     "Burrowing Owl Habitat": lyrBUOWL,
                     "Raptor Nest": lyrRaptorNests,
+                    "GBH Rookeries": lyrGBH,
                     "Eagle Nest": lyrMarkerCluster,
                     "Drawn Items":fgpDrawnItems
                 };
