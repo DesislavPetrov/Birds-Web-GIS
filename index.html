@@ -135,6 +135,7 @@
             var lyrClientLines;
             var lyrBUOWL;
             var lyrGBH;
+            var lyrSearch;
             var lyrMarkerCluster;
             var mrkCurrentLocation;
             var fgpDrawnItems;
@@ -241,7 +242,6 @@
                 ctlDraw.addTo(map);
 
                 map.on('draw:created', function(e){
-                    console.log(e);
                     fgpDrawnItems.addLayer(e.layer);
                 });
                 
@@ -259,7 +259,6 @@
 
                 // Location Events //
                 map.on('locationfound', function(e) {
-                    console.log(e);
                     if (mrkCurrentLocation) {
                         mrkCurrentLocation.remove();
                     }
@@ -268,7 +267,6 @@
                 });
 
                 map.on('locationerror', function(e) {
-                    console.log(e);
                     alert("Location was not found");
                 })
 
@@ -348,7 +346,33 @@
                 lyr.bindTooltip("<h4>Linear Project: " + att.Project + "</h4>Type: " + att.type + "</br>Row Width: " + att.row_width);
             }
             
-            ////////////////
+            // Search a linear project by ID //
+            function returnClientLineByID (id){
+                var arLayers = lyrClientLines.getLayers();
+                for(i=0; i<= arLayers.length-1;i++){
+                    var featureID = arLayers[i].feature.properties.Project;
+                    if(featureID == id){
+                        return arLayers[i];
+                    }
+                }
+                return false;
+            }
+            
+            $("#btnFindProject").click(function(){
+                var id = $("#txtFindProject").val();
+                var lyr = returnClientLineByID(id);
+                if(lyr){
+                    if(lyrSearch){
+                        lyrSearch.remove();
+                    }
+                    lyrSearch = L.geoJSON(lyr.toGeoJSON(), {style:{color:"red", weight:10, opacity:0.5}}).addTo(map);
+                    map.fitBounds(lyr.getBounds().pad(1));
+                    var att = lyr.feature.properties;
+                    $("#divProjectData").html("<h4 class='text-center'>Attributes</h4><h5>Type: " + att.type + "</h5><h5>Row width: " + att.row_width + "m </h5>")
+                } else {
+                    $("#divProjectError").html("**** Project ID not found ****");
+                }
+            })
             
             // Eagle Functions //
              function returnEagleMarker(json, latlng){
