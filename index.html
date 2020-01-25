@@ -85,11 +85,42 @@
             #mapdiv {
                 height:100vh;
             }
+            
+            .col-xs-12, col-xs-5, col-xs-4{
+                padding: 3px;
+            }
+            
+            #divProject{
+                background-color: beige;
+            }
+            
+            .errorMsg{
+                padding:0;
+                text-align: center;
+                background-color: darksalmon;
+            }
+            
+            
         </style>
     </head>
     <body>
         <div id="side-bar" class="col-md-3">
-            <button id='btnLocate' class='btn btn-primary btn-block'>Locate</button>
+            <button id='btnLocate' class='btn btn-primary btn-block'>Locate</button><br>
+            <div id="divProject" class="col-xs-12">
+                <div id="divProjectLabel" class="text-center col-xs-12">
+                    <h4>Linear Projects</h4>
+                </div>
+                <div id="divProjectError" class="errorMsg col-xs-12"></div>
+                <div id="divFindProject" class="form-group">
+                    <div class="col-xs-6">
+                        <input type="text" id="txtFindProject" class="form-control" placeholder="Project ID">
+                    </div>
+                    <div class="col-xs-6">
+                        <button id="btnFindProject" class="btn btn-primary btn-block">Find Project</button>
+                    </div>
+                </div>
+                <div class="" id="divProjectData"></div>
+            </div>            
         </div>
         <div id="mapdiv" class="col-md-12"></div>
         <script>
@@ -316,6 +347,8 @@
                 var att = json.properties;
                 lyr.bindTooltip("<h4>Linear Project: " + att.Project + "</h4>Type: " + att.type + "</br>Row Width: " + att.row_width);
             }
+            
+            ////////////////
             
             // Eagle Functions //
              function returnEagleMarker(json, latlng){
