@@ -88,22 +88,32 @@
             #mapdiv {
                 height:100vh;
             }
-            
-            .col-xs-12, col-xs-5, col-xs-4{
-                padding: 3px;
+
+            .col-xs-12, .col-xs-6, .col-xs-4 {
+                padding:3px;
             }
-            
-            #divProject{
+
+            #divProject {
                 background-color: beige;
             }
             
-            .errorMsg{
-                padding:0;
-                text-align: center;
-                background-color: darksalmon;
+            #divBUOWL {
+                background-color: #ffffb3;
             }
             
+            #divEagle {
+                background-color: #ccffb3;
+            }
             
+            #divRaptor {
+                background-color: #e6ffff;
+            }
+            
+            .errorMsg {
+                padding:0;
+                text-align:center;
+                background-color:darksalmon;
+            }    
         </style>
     </head>
     <body>
@@ -111,19 +121,64 @@
             <button id='btnLocate' class='btn btn-primary btn-block'>Locate</button><br>
             <div id="divProject" class="col-xs-12">
                 <div id="divProjectLabel" class="text-center col-xs-12">
-                    <h4>Linear Projects</h4>
+                    <h4 id="lblProject">Linear Projects</h4>
                 </div>
                 <div id="divProjectError" class="errorMsg col-xs-12"></div>
-                <div id="divFindProject" class="form-group">
+                <div id="divFindProject" class="form-group has-error">
                     <div class="col-xs-6">
                         <input type="text" id="txtFindProject" class="form-control" placeholder="Project ID">
                     </div>
                     <div class="col-xs-6">
-                        <button id="btnFindProject" class="btn btn-primary btn-block">Find Project</button>
+                        <button id="btnFindProject" class="btn btn-primary btn-block" disabled>Find Project</button>
                     </div>
                 </div>
                 <div class="" id="divProjectData"></div>
-            </div>            
+            </div>
+            <div id="divBUOWL" class="col-xs-12">
+                <div id="divBUOWLLabel" class="text-center col-xs-12">
+                    <h4 id="lblBUOWL">BUOWL Habitat</h4>
+                </div>
+                <div id="divBUOWLError" class="errorMsg col-xs-12"></div>
+                <div id="divFindBUOWL" class="form-group has-error">
+                    <div class="col-xs-6">
+                        <input type="text" id="txtFindBUOWL" class="form-control" placeholder="Habitat ID">
+                    </div>
+                    <div class="col-xs-6">
+                        <button id="btnFindBUOWL" class="btn btn-primary btn-block" disabled>Find BUOWL</button>
+                    </div>
+                </div>
+                <div class="" id="divBUOWLData"></div>
+            </div>
+            <div id="divEagle" class="col-xs-12">
+                <div id="divEagleLabel" class="text-center col-xs-12">
+                    <h4 id="lblEagle">Eagle Nests</h4>
+                </div>
+                <div id="divEagleError" class="errorMsg col-xs-12"></div>
+                <div id="divFindEagle" class="form-group has-error">
+                    <div class="col-xs-6">
+                        <input type="text" id="txtFindEagle" class="form-control" placeholder="Eagle Nest ID">
+                    </div>
+                    <div class="col-xs-6">
+                        <button id="btnFindEagle" class="btn btn-primary btn-block" disabled>Find Eagle Nest</button>
+                    </div>
+                </div>
+                <div class="" id="divEagleData"></div>
+            </div>
+            <div id="divRaptor" class="col-xs-12">
+                <div id="divRaptorLabel" class="text-center col-xs-12">
+                    <h4 id="lblRaptor">Raptor Nests</h4>
+                </div>
+                <div id="divRaptorError" class="errorMsg col-xs-12"></div>
+                <div id="divFindRaptor" class="form-group has-error">
+                    <div class="col-xs-6">
+                        <input type="text" id="txtFindRaptor" class="form-control" placeholder="Raptor Nest ID">
+                    </div>
+                    <div class="col-xs-6">
+                        <button id="btnFindRaptor" class="btn btn-primary btn-block" disabled>Find Raptor Nest</button>
+                    </div>
+                </div>
+                <div class="" id="divRaptorData"></div>
+            </div>
         </div>
         <div id="mapdiv" class="col-md-12"></div>
         <script>
@@ -142,81 +197,96 @@
             var lyrMarkerCluster;
             var mrkCurrentLocation;
             var fgpDrawnItems;
-            var popZocalo;
             var ctlAttribute;
             var ctlScale;
-            /*var ctlPan;*/
-            var ctlZoomslider;
             var ctlMouseposition;
-            /*var ctlMeasure;*/
+            var ctlMeasure;
             var ctlEasybutton;
             var ctlSidebar;
-            var ctlSearch;
             var ctlLayers;
             var ctlDraw;
             var ctlStyle;
             var objBasemaps;
             var objOverlays;
             var arProjectIDs = [];
+            var arHabitatIDs = [];
+            var arEagleIDs = [];
+            var arRaptorIDs = [];
             
-
             $(document).ready(function(){
                 
-                // Initialization // 
+                //  ********* Map Initialization ****************
+                
                 map = L.map('mapdiv', {center:[40.18, -104.83], zoom:11, attributionControl:false});
                 
-                // Layer Initialization //
+                ctlSidebar = L.control.sidebar('side-bar').addTo(map);
+                
+                ctlEasybutton = L.easyButton('glyphicon-transfer', function(){
+                   ctlSidebar.toggle(); 
+                }).addTo(map);
+                
+                ctlAttribute = L.control.attribution().addTo(map);
+                ctlAttribute.addAttribution('OSM');
+                ctlAttribute.addAttribution('&copy; <a href="http://millermountain.com">Miller Mountain LLC</a>');
+                
+                ctlScale = L.control.scale({position:'bottomleft', metric:false, maxWidth:200}).addTo(map);
+
+                ctlMouseposition = L.control.mousePosition().addTo(map);
+                
+                ctlStyle = L.control.styleEditor({position:'topright'}).addTo(map);
+                ctlMeasure = L.control.polylineMeasure().addTo(map);
+                
+                //   *********** Layer Initialization **********
+                
                 lyrOSM = L.tileLayer.provider('OpenStreetMap.Mapnik');
                 lyrTopo = L.tileLayer.provider('OpenTopoMap');
                 lyrImagery = L.tileLayer.provider('Esri.WorldImagery');
                 lyrOutdoors = L.tileLayer.provider('Thunderforest.Outdoors');
                 lyrWatercolor = L.tileLayer.provider('Stamen.Watercolor');
                 map.addLayer(lyrOSM);
-
-                ctlSidebar = L.control.sidebar('side-bar').addTo(map);
-
-                ctlEasybutton = L.easyButton('glyphicon-transfer', function(){
-                    ctlSidebar.toggle(); 
-                }).addTo(map);
-
-                ctlAttribute = L.control.attribution({position:'bottomleft'}).addTo(map);
-                ctlAttribute.addAttribution('OSM');
-                ctlAttribute.addAttribution('<a href= "http://geocadder.bg">geocadder</a>');
-
-                ctlScale = L.control.scale({position:'bottomleft', metric:false, maxWidth:200}).addTo(map);
-                ctlMouseposition = L.control.mousePosition().addTo(map);
-
-                ctlStyle = L.control.styleEditor({position:'topright'}).addTo(map);
-
+                
                 fgpDrawnItems = new L.FeatureGroup();
                 fgpDrawnItems.addTo(map);
-
-                lyrEagleNests = L.geoJSON.ajax("data/wildlife_eagle.geojson", {pointToLayer:returnEagleMarker}).addTo(map);
+                
+                lyrEagleNests = L.geoJSON.ajax('data/wildlife_eagle.geojson', {pointToLayer:returnEagleMarker}).addTo(map);
+                lyrEagleNests.on('data:loaded', function(){
+                    arEagleIDs.sort(function(a,b){return a-b});
+                    $("#txtFindEagle").autocomplete({
+                        source:arEagleIDs
+                    });
+                });
                 
                 lyrMarkerCluster = L.markerClusterGroup();
-
-                lyrRaptorNests = L.geoJSON.ajax("data/wildlife_raptor.geojson", {pointToLayer:returnRaptorMarker}).addTo(map);
-                lyrRaptorNests.on("data:loaded", function(){
+                lyrRaptorNests = L.geoJSON.ajax('data/wildlife_raptor.geojson', {pointToLayer:returnRaptorMarker});
+                lyrRaptorNests.on('data:loaded', function(){
+                    arRaptorIDs.sort(function(a,b){return a-b});
+                    $("#txtFindRaptor").autocomplete({
+                        source:arRaptorIDs
+                    });
                     lyrMarkerCluster.addLayer(lyrRaptorNests);
                     lyrMarkerCluster.addTo(map);
-                })
+                });
                 
-                // added MultiLineString data
                 lyrClientLines = L.geoJSON.ajax('data/client_lines.geojson', {style:styleClientLinears, onEachFeature:processClientLinears}).addTo(map);
                 lyrClientLines.on('data:loaded', function(){
                     arProjectIDs.sort(function(a,b){return a-b});
                     $("#txtFindProject").autocomplete({
-                        source: arProjectIDs
-                    })
-                })
+                        source:arProjectIDs
+                    });
+                });
                 
-                
-                // adding MultiPolygon data
-                lyrBUOWL = L.geoJSON.ajax('data/wildlife_buowl.geojson', {style: styleBUOWL, onEachFeature:processBUOWL, filter:filterBUOWL}).addTo(map);
+                lyrBUOWL = L.geoJSON.ajax('data/wildlife_buowl.geojson', {style:styleBUOWL, onEachFeature:processBUOWL, filter:filterBUOWL}).addTo(map);
+                lyrBUOWL.on('data:loaded', function(){
+                    arHabitatIDs.sort(function(a,b){return a-b});
+                    $("#txtFindBUOWL").autocomplete({
+                        source:arHabitatIDs
+                    });
+                });
                 
                 lyrGBH = L.geoJSON.ajax('data/wildlife_gbh.geojson', {style:{color:'fuchsia'}}).bindTooltip("GBH Nesting Area").addTo(map);
-
-                // Setup Layer Control //
+                
+                // ********* Setup Layer Control  ***************
+                
                 objBasemaps = {
                     "Open Street Maps": lyrOSM,
                     "Topo Map":lyrTopo,
@@ -226,78 +296,56 @@
                 };
                 
                 objOverlays = {
-                    "Client Linears": lyrClientLines,
-                    "Burrowing Owl Habitat": lyrBUOWL,
-                    "Raptor Nest": lyrRaptorNests,
-                    "GBH Rookeries": lyrGBH,
-                    "Eagle Nest": lyrMarkerCluster,
+                    "Client Linears":lyrClientLines,
+                    "Burrowing Owl Habitat":lyrBUOWL,
+                    "Eagle Nest":lyrEagleNests,
+                    "Raptor Nest":lyrMarkerCluster,
+                    "GBH Rookeries":lyrGBH,
                     "Drawn Items":fgpDrawnItems
                 };
-
+                
                 ctlLayers = L.control.layers(objBasemaps, objOverlays).addTo(map);
-
-                /*ctlPan = L.control.pan().addTo(map);*/
-
-                /*ctlMeasure = L.control.polylineMeasure().addTo(map);*/
-
-                // Draw Control //                
+                
+                // **********  Setup Draw Control ****************
+                
                 ctlDraw = new L.Control.Draw({
                     draw:{
                         circle:false,
-                        rectangle: false
+                        rectangle:false,
                     },
                     edit:{
                         featureGroup:fgpDrawnItems
                     }
                 });
                 ctlDraw.addTo(map);
-
+                
                 map.on('draw:created', function(e){
                     fgpDrawnItems.addLayer(e.layer);
                 });
                 
+                // ************ Location Events **************
                 
-                /*map.on('contextmenu', function(e) {
-                    var dtCurrentTime = new Date();
-                    L.marker(e.latlng).addTo(map).bindPopup(e.latlng.toString()+"<br>"+dtCurrentTime.toString());
-                });
-
-                map.on('keypress', function(e) {
-                    if (e.originalEvent.key=="l") {
-                        map.locate();
-                    }
-                });*/
-
-                // Location Events //
                 map.on('locationfound', function(e) {
+                    console.log(e);
                     if (mrkCurrentLocation) {
                         mrkCurrentLocation.remove();
                     }
                     mrkCurrentLocation = L.circle(e.latlng, {radius:e.accuracy/2}).addTo(map);
                     map.setView(e.latlng, 14);
                 });
-
+                
                 map.on('locationerror', function(e) {
+                    console.log(e);
                     alert("Location was not found");
                 })
-
-                /*map.on('zoomend', function(){
-                    $("#zoom-level").html(map.getZoom());
-                });
-
-                map.on('moveend', function(){
-                    $("#map-center").html(LatLngToArrayString(map.getCenter()));
-                });
-
-                map.on('mousemove', function(e){
-                    $("#mouse-location").html(LatLngToArrayString(e.latlng));
-                });*/
+                
             });
-            
-            // BUOWL Functions //
-            function styleBUOWL (json){
+
+            //  ********* BUOWL Functions
+
+            function styleBUOWL(json){
                 var att = json.properties;
-                switch(att.hist_occup){
+                switch (att.hist_occup){
                     case 'Yes':
                         return {color:'deeppink', fillColor:'yellow'};
                         break;
@@ -307,136 +355,250 @@
                 }
             }
             
-            function processBUOWL (json, lyr){
+            function processBUOWL(json, lyr){
                 var att = json.properties;
-                lyr.bindTooltip("<h4>Habitat ID: " + att.habitat_id + "</h4>Historically Occupied:" + att.hist_occup + "<br>Status: " + att.recentstatus);
+                lyr.bindTooltip("<h4>Habitat ID: "+att.habitat_id+"</h4>Historically Occupied: "+att.hist_occup+"<br>Status: "+att.recentstatus);
+                arHabitatIDs.push(att.habitat_id.toString())
             }
             
             function filterBUOWL(json){
                 var att = json.properties;
-                if(att.recentStatus=='REMOVED'){
+                if (att.recentstatus=='REMOVED') {
                     return false;
                 } else {
                     return true;
                 }
             }
             
-            // Client Linears Functions //
-            function styleClientLinears(json){
+            $("#txtFindBUOWL").on('keyup paste', function(){
+                var val = $("#txtFindBUOWL").val();
+                testLayerAttribute(arHabitatIDs, val, "Habitat ID", "#divFindBUOWL", "#divBUOWLError", "#btnFindBUOWL");
+            });
+            
+            $("#btnFindBUOWL").click(function(){
+                var val = $("#txtFindBUOWL").val();
+                var lyr = returnLayerByAttribute(lyrBUOWL,'habitat_id',val);
+                if (lyr) {
+                    if (lyrSearch) {
+                        lyrSearch.remove();
+                    }
+                    lyrSearch = L.geoJSON(lyr.toGeoJSON(), {style:{color:'red', weight:10, opacity:0.5, fillOpacity:0}}).addTo(map);
+                    map.fitBounds(lyr.getBounds().pad(1));
+                    var att = lyr.feature.properties;
+                    $("#divBUOWLData").html("<h4 class='text-center'>Attributes</h4><h5>Habitat: "+att.habitat+"</h5><h5>Historically Occupied: "+att.hist_occup+"</h5><h5>Recent Status: "+att.recentstatus+"</h5>");
+                    $("#divBUOWLError").html("");
+                } else {
+                    $("#divBUOWLError").html("**** Habitat ID not found ****");
+                }
+            });
+            
+            $("#lblBUOWL").click(function(){
+                $("#divBUOWLData").toggle(); 
+            });
+            
+            // ************ Client Linears **********
+            
+            function styleClientLinears(json) {
                 var att = json.properties;
-                switch(att.type){
+                switch (att.type) {
                     case 'Pipeline':
                         return {color:'peru'};
                         break;
-                     case 'Flowline':
+                    case 'Flowline':
                         return {color:'navy'};
-                        break;    
-                      case 'Flowline, est.':
-                        return {color:'navy', dashArray:"5.5"};
-                        break;   
-                    case 'Electric line':
+                        break;
+                    case 'Flowline, est.':
+                        return {color:'navy', dashArray:"5,5"};
+                        break;
+                    case 'Electric Line':
                         return {color:'darkgreen'};
-                        break; 
+                        break;
                     case 'Access Road - Confirmed':
-                        return {color:'darkgreen'};
-                        break;   
+                        return {color:'darkred'};
+                        break;
                     case 'Access Road - Estimated':
-                        return {color:'darkred', dashArray:"5.5"};
-                        break;  
+                        return {color:'darkred', dashArray:"5,5"};
+                        break;
                     case 'Extraction':
                         return {color:'indigo'};
                         break;
                     default:
                         return {color:'darkgoldenrod'}
-                        break;
                 }
             }
             
-            function processClientLinears(json, lyr){
+            function processClientLinears(json, lyr) {
                 var att = json.properties;
-                lyr.bindTooltip("<h4>Linear Project: " + att.Project + "</h4>Type: " + att.type + "</br>Row Width: " + att.row_width);
+                lyr.bindTooltip("<h4>Linear Project: "+att.Project+"</h4>Type: "+att.type+"<br>ROW Width: "+att.row_width);
                 arProjectIDs.push(att.Project.toString());
             }
             
-            // Search a linear project by ID //
-            function returnClientLineByID (id){
-                var arLayers = lyrClientLines.getLayers();
-                for(i=0; i<= arLayers.length-1;i++){
-                    var featureID = arLayers[i].feature.properties.Project;
-                    if(featureID == id){
+            $("#txtFindProject").on('keyup paste', function(){
+                var val = $("#txtFindProject").val();
+                testLayerAttribute(arProjectIDs, val, "PROJECT ID", "#divFindProject", "#divProjectError", "#btnFindProject");
+            });
+            
+            $("#btnFindProject").click(function(){
+                var val = $("#txtFindProject").val();
+                var lyr = returnLayerByAttribute(lyrClientLines,'Project',val);
+                if (lyr) {
+                    if (lyrSearch) {
+                        lyrSearch.remove();
+                    }
+                    lyrSearch = L.geoJSON(lyr.toGeoJSON(), {style:{color:'red', weight:10, opacity:0.5}}).addTo(map);
+                    map.fitBounds(lyr.getBounds().pad(1));
+                    var att = lyr.feature.properties;
+                    $("#divProjectData").html("<h4 class='text-center'>Attributes</h4><h5>Type: "+att.type+"</h5><h5>ROW width: "+att.row_width+ "m </h5>");
+                    $("#divProjectError").html("");
+                } else {
+                    $("#divProjectError").html("**** Project ID not found ****");
+                }
+            });
+            
+            $("#lblProject").click(function(){
+                $("#divProjectData").toggle(); 
+            });
+            
+            // *********  Eagle Functions *****************
+            
+            function returnEagleMarker(json, latlng){
+                var att = json.properties;
+                if (att.status=='ACTIVE NEST') {
+                    var clrNest = 'deeppink';
+                } else {
+                    var clrNest = 'chartreuse';
+                }
+                arEagleIDs.push(att.nest_id.toString());
+                return L.circle(latlng, {radius:804, color:clrNest,fillColor:'chartreuse', fillOpacity:0.5}).bindTooltip("<h4>Eagle Nest: "+att.nest_id+"</h4>Status: "+att.status);
+            }
+            
+            $("#txtFindEagle").on('keyup paste', function(){
+                var val = $("#txtFindEagle").val();
+                testLayerAttribute(arEagleIDs, val, "Eagle Nest ID", "#divFindEagle", "#divEagleError", "#btnFindEagle");
+            });
+            
+            $("#btnFindEagle").click(function(){
+                var val = $("#txtFindEagle").val();
+                var lyr = returnLayerByAttribute(lyrEagleNests,'nest_id',val);
+                if (lyr) {
+                    if (lyrSearch) {
+                        lyrSearch.remove();
+                    }
+                    lyrSearch = L.circle(lyr.getLatLng(), {radius:800, color:'red', weight:10, opacity:0.5, fillOpacity:0}).addTo(map);
+                    map.setView(lyr.getLatLng(), 14);
+                    var att = lyr.feature.properties;
+                    $("#divEagleData").html("<h4 class='text-center'>Attributes</h4><h5>Status: "+att.status+"</h5>");
+                    $("#divEagleError").html("");
+                } else {
+                    $("#divEagleError").html("**** Eagle Nest ID not found ****");
+                }
+            });
+            
+            $("#lblEagle").click(function(){
+                $("#divEagleData").toggle(); 
+            });
+            
+            //  *********** Raptor Functions
+            
+            function returnRaptorMarker(json, latlng){
+                var att = json.properties;
+                arRaptorIDs.push(att.Nest_ID.toString());
+                switch (att.recentspecies) {
+                    case 'Red-tail Hawk':
+                        var radRaptor = 533;
+                        break;
+                    case 'Swainsons Hawk':
+                        var radRaptor = 400;
+                        break;
+                    default:
+                        var radRaptor = 804;
+                        break;
+                }
+                switch (att.recentstatus) {
+                    case 'ACTIVE NEST':
+                        var optRaptor = {radius:radRaptor, color:'deeppink', fillColor:"cyan", fillOpacity:0.5};
+                        break;
+                    case 'INACTIVE NEST':
+                        var optRaptor = {radius:radRaptor, color:'cyan', fillColor:'cyan', fillOpacity:0.5};
+                        break;
+                    case 'FLEDGED NEST':
+                        var optRaptor = {radius:radRaptor, color:'deeppink', fillColor:"cyan", fillOpacity:0.5, dashArray:"2,8"};
+                        break;
+                }
+                return L.circle(latlng, optRaptor).bindPopup("<h4>Raptor Nest: "+att.Nest_ID+"</h4>Status: "+att.recentstatus+"<br>Species: "+att.recentspecies+"<br>Last Survey: "+att.lastsurvey);
+            }
+                
+            $("#txtFindRaptor").on('keyup paste', function(){
+                var val = $("#txtFindRaptor").val();
+                testLayerAttribute(arRaptorIDs, val, "Raptor Nest ID", "#divFindRaptor", "#divRaptorError", "#btnFindRaptor");
+            });
+            
+            $("#btnFindRaptor").click(function(){
+                var val = $("#txtFindRaptor").val();
+                var lyr = returnLayerByAttribute(lyrRaptorNests,'Nest_ID',val);
+                if (lyr) {
+                    if (lyrSearch) {
+                        lyrSearch.remove();
+                    }
+                    var att = lyr.feature.properties;
+                    switch (att.recentspecies) {
+                        case 'Red-tail Hawk':
+                            var radRaptor = 533;
+                            break;
+                        case 'Swainsons Hawk':
+                            var radRaptor = 400;
+                            break;
+                        default:
+                            var radRaptor = 804;
+                            break;
+                    }
+                    lyrSearch = L.circle(lyr.getLatLng(), {radius:radRaptor, color:'red', weight:10, opacity:0.5, fillOpacity:0}).addTo(map);
+                    map.setView(lyr.getLatLng(), 14);
+                    $("#divRaptorData").html("<h4 class='text-center'>Attributes</h4><h5>Status: "+att.recentstatus+"</h5><h5>Species: "+att.recentspecies+"</h5><h5>Last Survey: "+att.lastsurvey+"</h5>");
+                    $("#divRaptorError").html("");
+                } else {
+                    $("#divRaptorError").html("**** Raptor Nest ID not found ****");
+                }
+            });
+            
+            $("#lblRaptor").click(function(){
+                $("#divRaptorData").toggle(); 
+            });
+            
+            //  *********  jQuery Event Handlers  ************
+            
+            $("#btnLocate").click(function(){
+                map.locate();
+            });
+            
+            //  ***********  General Functions *********
+            
+            function LatLngToArrayString(ll) {
+                return "["+ll.lat.toFixed(5)+", "+ll.lng.toFixed(5)+"]";
+            }
+            
+            function returnLayerByAttribute(lyr,att,val) {
+                var arLayers = lyr.getLayers();
+                for (i=0;i<arLayers.length-1;i++) {
+                    var ftrVal = arLayers[i].feature.properties[att];
+                    if (ftrVal==val) {
                         return arLayers[i];
                     }
                 }
                 return false;
             }
             
-            $("#btnFindProject").click(function(){
-                var id = $("#txtFindProject").val();
-                var lyr = returnClientLineByID(id);
-                if(lyr){
-                    if(lyrSearch){
-                        lyrSearch.remove();
-                    }
-                    lyrSearch = L.geoJSON(lyr.toGeoJSON(), {style:{color:"red", weight:10, opacity:0.5}}).addTo(map);
-                    map.fitBounds(lyr.getBounds().pad(1));
-                    var att = lyr.feature.properties;
-                    $("#divProjectData").html("<h4 class='text-center'>Attributes</h4><h5>Type: " + att.type + "</h5><h5>Row width: " + att.row_width + "m </h5>")
+            function testLayerAttribute(ar, val, att, fg, err, btn) {
+                if (ar.indexOf(val)<0) {
+                    $(fg).addClass("has-error");
+                    $(err).html("**** "+att+" NOT FOUND ****");
+                    $(btn).attr("disabled", true);
                 } else {
-                    $("#divProjectError").html("**** Project ID not found ****");
+                    $(fg).removeClass("has-error");
+                    $(err).html("");
+                    $(btn).attr("disabled", false);
                 }
-            })
-            
-            // Eagle Functions //
-             function returnEagleMarker(json, latlng){
-                var att = json.properties;
-
-                if(att.status == "ACTIVE NEST"){
-                    var clrNest = "deeppink";
-                } else {
-                    var clrNest = "green";
-                }
-                return L.circle(latlng, {radius:804, color:clrNest, fillColor: 'green', fillOpacity: 0.5}).bindTooltip("<h4>Eagle Nest: " + att.nest_id + "</h4>Status: " + att.status);
             }
-            
-            // Raptor Functions //
-            function returnRaptorMarker (json, latlng){
-                var att = json.properties;
-                switch (att.recentspecies){
-                    case "Red-tail Hawk":
-                        var radRaptor = 533;
-                        break;
-                    case "Swainsons Hawk": 
-                        var radRaptor = 400;
-                        break;
-                    default: 
-                        var radRaptor = 804;
-                        break;
-                }
-                switch(att.recentstatus){
-                    case 'ACTIVE NEST':
-                        var optRaptor = {radius: radRaptor, color: "deeppink", fillColor: "blue", fillOpacity: 0.5};
-                        break;
-                    case "INACTIVE NEST":
-                        var optRaptor = {radius: radRaptor, color: "blue", fillColor: "blue", fillOpacity: 0.5};
-                        break;
-                    case "FLEDGED NEST":
-                        var optRaptor = {radius: radRaptor, color: "deeppink", fillColor: "blue", fillOpacity: 0.5, dashArray: "2.8"};
-                        break;
-                }
-                return L.circle(latlng, optRaptor).bindPopup("<h4>Raptor Nest: " + att.Nest_ID + "</h4>Status: " + att.recentstatus + "</br>Species: " + att.recentspecies + "</br>Last Survey: " + att.lastsurvey);
-            }
-            
-            // jQuery Event Handlers //
-            $("#btnLocate").click(function(){
-                    map.locate();
-                });
-
-            
-            // General Functions //
-            function LatLngToArrayString(ll) {
-                return "["+ll.lat.toFixed(5)+", "+ll.lng.toFixed(5)+"]";
-            }
-
         </script>
     </body>
 </html>
