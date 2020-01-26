@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />-->
         <title>Birds Web GIS</title>
 
         <link rel="stylesheet" href="src/leaflet.css">
@@ -22,6 +23,7 @@
         <link rel="stylesheet" href="src/plugins/leaflet-mapkey/L.Icon.Mapkey.css">
         <link rel="stylesheet" href="src/plugins/MarkerCluster.css">
         <link rel="stylesheet" href="src/plugins/MarkerCluster.Default.css">
+        <link rel="stylesheet" href="src/jquery-ui.min.css">
 
         <script src="src/leaflet-src.js"></script>
         <script src="src/jquery-3.2.0.min.js"></script>
@@ -40,6 +42,7 @@
         <script src="src/plugins/leaflet.awesome-markers.min.js"></script>
         <script src="src/plugins/leaflet-mapkey/L.Icon.Mapkey.js"></script>
         <script src="src/plugins/leaflet.markercluster-src.js"></script>
+        <script src="src/jquery-ui.min.js"></script>
 
         <!--    ***************  Begin Leaflet.Draw-->
 
@@ -154,6 +157,7 @@
             var ctlStyle;
             var objBasemaps;
             var objOverlays;
+            var arProjectIDs = [];
             
 
             $(document).ready(function(){
@@ -199,6 +203,13 @@
                 
                 // added MultiLineString data
                 lyrClientLines = L.geoJSON.ajax('data/client_lines.geojson', {style:styleClientLinears, onEachFeature:processClientLinears}).addTo(map);
+                lyrClientLines.on('data:loaded', function(){
+                    arProjectIDs.sort(function(a,b){return a-b});
+                    $("#txtFindProject").autocomplete({
+                        source: arProjectIDs
+                    })
+                })
+                
                 
                 // adding MultiPolygon data
                 lyrBUOWL = L.geoJSON.ajax('data/wildlife_buowl.geojson', {style: styleBUOWL, onEachFeature:processBUOWL, filter:filterBUOWL}).addTo(map);
@@ -344,6 +355,7 @@
             function processClientLinears(json, lyr){
                 var att = json.properties;
                 lyr.bindTooltip("<h4>Linear Project: " + att.Project + "</h4>Type: " + att.type + "</br>Row Width: " + att.row_width);
+                arProjectIDs.push(att.Project.toString());
             }
             
             // Search a linear project by ID //
