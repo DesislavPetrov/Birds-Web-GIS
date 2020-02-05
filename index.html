@@ -162,6 +162,17 @@
                         <button id="btnFindEagle" class="btn btn-primary btn-block" disabled>Find Eagle Nest</button>
                     </div>
                 </div>
+                <div id="divFilterEagle" class="col-xs-12">
+                    <div class="col-xs-4">
+                        <input type="radio" name="fltEagle" value="ALL" checked>All
+                     </div>
+                     <div class="col-xs-4">
+                        <input type="radio" name="fltEagle" value="ACTIVE NEST">Active
+                     </div>
+                     <div class="col-xs-4">
+                        <input type="radio" name="fltEagle" value="INACTIVE LOCATION">Inactive
+                     </div>
+                </div>
                 <div class="" id="divEagleData"></div>
             </div>
             <div id="divRaptor" class="col-xs-12">
@@ -248,7 +259,7 @@
                 fgpDrawnItems = new L.FeatureGroup();
                 fgpDrawnItems.addTo(map);
                 
-                lyrEagleNests = L.geoJSON.ajax('data/wildlife_eagle.geojson', {pointToLayer:returnEagleMarker}).addTo(map);
+                lyrEagleNests = L.geoJSON.ajax('data/wildlife_eagle.geojson', {pointToLayer:returnEagleMarker, filter:filterEagle}).addTo(map);
                 lyrEagleNests.on('data:loaded', function(){
                     arEagleIDs.sort(function(a,b){return a-b});
                     $("#txtFindEagle").autocomplete({
@@ -274,6 +285,8 @@
                         source:arProjectIDs
                     });
                 });
+
+                console.log(arProjectIDs);
                 
                 lyrBUOWL = L.geoJSON.ajax('data/wildlife_buowl.geojson', {style:styleBUOWL, onEachFeature:processBUOWL, filter:filterBUOWL}).addTo(map);
                 lyrBUOWL.on('data:loaded', function(){
@@ -472,6 +485,16 @@
                 return L.circle(latlng, {radius:804, color:clrNest,fillColor:'chartreuse', fillOpacity:0.5}).bindTooltip("<h4>Eagle Nest: "+att.nest_id+"</h4>Status: "+att.status);
             }
             
+            function filterEagle(json){
+                var att = json.properties;
+                var optFilter = $("input[name=fltEagle]:checked").val();
+                if(optFilter == "ALL"){
+                    return true;
+                } else {
+                    return (att.status == optFilter);
+                }
+            }
+            
             $("#txtFindEagle").on('keyup paste', function(){
                 var val = $("#txtFindEagle").val();
                 testLayerAttribute(arEagleIDs, val, "Eagle Nest ID", "#divFindEagle", "#divEagleError", "#btnFindEagle");
@@ -496,6 +519,11 @@
             
             $("#lblEagle").click(function(){
                 $("#divEagleData").toggle(); 
+            });
+            
+            $("input[name=fltEagle]").click(function(){
+                arEagleIDs = [];
+                lyrEagleNests.refresh()
             });
             
             //  *********** Raptor Functions
