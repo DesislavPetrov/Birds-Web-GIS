@@ -34,7 +34,7 @@
         <script src="src/plugins/leaflet.markercluster.js"></script>
         <script src="src/plugins/leaflet.geometryutil.js"></script>
         <script src="src/jquery-ui.min.js"></script>
-        <script src="src/turf.min.js"></script>        
+        <script src="src/turf.min.js"></script>
         
 <!--    ***************  Begin Leaflet.Draw-->
         
@@ -237,6 +237,7 @@
             var lyrEagleNests;
             var lyrRaptorNests;
             var lyrClientLines;
+            var lyrClientLinesBuffer;
             var lyrBUOWL;
             var lyrBUOWLbuffer;
             var jsnBUOWLbuffer;
@@ -316,12 +317,15 @@
                     lyrMarkerCluster.addTo(map);
                 });
                 
+                lyrClientLinesBuffer = L.featureGroup();
                 lyrClientLines = L.geoJSON.ajax('data/client_lines.geojson', {style:styleClientLinears, onEachFeature:processClientLinears, filter:filterClientLines}).addTo(map);
                 lyrClientLines.on('data:loaded', function(){
                     arProjectIDs.sort(function(a,b){return a-b});
                     $("#txtFindProject").autocomplete({
                         source:arProjectIDs
                     });
+                    lyrClientLinesBuffer.addTo(map);
+                    lyrClientLines.bringToFront();
                 });
                 
                 lyrBUOWL = L.geoJSON.ajax('data/wildlife_buowl.geojson', {style:styleBUOWL, onEachFeature:processBUOWL, filter:filterBUOWL}).addTo(map);
@@ -330,7 +334,8 @@
                     $("#txtFindBUOWL").autocomplete({
                         source:arHabitatIDs
                     });
-                    jsnBUOWLbuffer = turf.buffer(lyrBUOWL.toGeoJSON(), 0.3, {units: 'kilometers'});
+                    jsnBUOWLbuffer = turf.buffer(lyrBUOWL.toGeoJSON(), 0.3, 'kilometers');
+                    console.log(jsnBUOWLbuffer);
                     lyrBUOWLbuffer = L.geoJSON(jsnBUOWLbuffer, {style:{color:'yellow', dashArray:'5,5', fillOpacity:0}}).addTo(map);
                     lyrBUOWL.bringToFront();
                 });
@@ -512,6 +517,9 @@
                 var att = json.properties;
                 lyr.bindTooltip("<h4>Linear Project: "+att.Project+"</h4>Type: "+att.type+"<br>ROW Width: "+att.row_width+"<br>Length: "+returnMultiLength(lyr.getLatLngs()).toFixed(0));
                 arProjectIDs.push(att.Project.toString());
+                var jsnBuffer = turf.buffer(json, att.row_width/1000, 'kilometers');
+                var lyrBuffer = L.geoJSON(jsnBuffer, {style:{color:'gray', dashArray:'5,5'}});
+                lyrClientLinesBuffer.addLayer(lyrBuffer);
             }
             
             function filterClientLines(json) {
