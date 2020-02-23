@@ -42,6 +42,7 @@
         <script src="src/plugins/leaflet.awesome-markers.min.js"></script>
         <script src="src/plugins/leaflet-mapkey/L.Icon.Mapkey.js"></script>
         <script src="src/plugins/leaflet.markercluster-src.js"></script>
+        <script src="src/plugins/leaflet.geometryutil.js"></script>        
         <script src="src/jquery-ui.min.js"></script>
 
         <!--    ***************  Begin Leaflet.Draw-->
@@ -310,17 +311,20 @@
                 
                 ctlDraw = new L.Control.Draw({
                     draw:{
+                        polyline:false,
+                        polygon:false,
                         circle:false,
                         rectangle:false,
                     },
                     edit:{
-                        featureGroup:fgpDrawnItems
+                        featureGroup:fgpDrawnItems,
+                        remove:false
                     }
                 });
                 ctlDraw.addTo(map);
                 
                 map.on('draw:created', function(e){
-                    fgpDrawnItems.addLayer(e.layer);
+                    fgpDrawnItems.addLayer(e.layer.bindPopup(e.layer.getLatLng().toString()));
                 });
                 
                 // ************ Location Events **************
@@ -387,6 +391,9 @@
                     var att = lyr.feature.properties;
                     $("#divBUOWLData").html("<h4 class='text-center'>Attributes</h4><h5>Habitat: "+att.habitat+"</h5><h5>Historically Occupied: "+att.hist_occup+"</h5><h5>Recent Status: "+att.recentstatus+"</h5>");
                     $("#divBUOWLError").html("");
+                    
+                    fgpDrawnItems.clearLayers();
+                    fgpDrawnItems.addLayer(lyr);
                 } else {
                     $("#divBUOWLError").html("**** Habitat ID not found ****");
                 }
@@ -429,7 +436,7 @@
             
             function processClientLinears(json, lyr) {
                 var att = json.properties;
-                lyr.bindTooltip("<h4>Linear Project: "+att.Project+"</h4>Type: "+att.type+"<br>ROW Width: "+att.row_width);
+                lyr.bindTooltip("<h4>Linear Project: "+att.Project+"</h4>Type: "+att.type+"<br>ROW Width: "+att.row_width + "<br>Length: " + returnMultiLength(lyr.getLatLngs()).toFixed(3));
                 arProjectIDs.push(att.Project.toString());
             }
             
@@ -450,6 +457,9 @@
                     var att = lyr.feature.properties;
                     $("#divProjectData").html("<h4 class='text-center'>Attributes</h4><h5>Type: "+att.type+"</h5><h5>ROW width: "+att.row_width+ "m </h5>");
                     $("#divProjectError").html("");
+                    
+                    fgpDrawnItems.clearLayers();
+                    fgpDrawnItems.addLayer(lyr);
                 } else {
                     $("#divProjectError").html("**** Project ID not found ****");
                 }
@@ -489,6 +499,9 @@
                     var att = lyr.feature.properties;
                     $("#divEagleData").html("<h4 class='text-center'>Attributes</h4><h5>Status: "+att.status+"</h5>");
                     $("#divEagleError").html("");
+                    
+                    fgpDrawnItems.clearLayers();
+                    fgpDrawnItems.addLayer(lyr);
                 } else {
                     $("#divEagleError").html("**** Eagle Nest ID not found ****");
                 }
@@ -556,6 +569,9 @@
                     map.setView(lyr.getLatLng(), 14);
                     $("#divRaptorData").html("<h4 class='text-center'>Attributes</h4><h5>Status: "+att.recentstatus+"</h5><h5>Species: "+att.recentspecies+"</h5><h5>Last Survey: "+att.lastsurvey+"</h5>");
                     $("#divRaptorError").html("");
+                    
+                    fgpDrawnItems.clearLayers();
+                    fgpDrawnItems.addLayer(lyr);
                 } else {
                     $("#divRaptorError").html("**** Raptor Nest ID not found ****");
                 }
@@ -598,6 +614,22 @@
                     $(err).html("");
                     $(btn).attr("disabled", false);
                 }
+            }
+            
+            function returnLength(arLL){
+                var total = 0;
+                for(var i=1; i<arLL.length; i++){
+                    total = total + arLL[i-1].distanceTo(arLL[i]);
+                }
+                return total;
+            }
+            
+            function returnMultiLength(arArLL){
+                var total=0;
+                for(var i=0; i<arArLL.length; i++){
+                    total = total + returnLength(arArLL[i]);
+                }
+                return total;
             }
         </script>
     </body>
