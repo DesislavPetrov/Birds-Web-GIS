@@ -404,6 +404,24 @@
                                 strPopup += "<br> "+sumEagle[0][i]+": "+sumEagle[1][i];
                             }                           
                             
+                           var arRTH = returnLayersByAttribute(lyrRaptorNests, 'recentspecies', 'Red-tail Hawk');
+                            var fcRTH = L.featureGroup(arRTH).toGeoJSON();
+                            var colRTH = summarizePointsByLine(line, 0.533, fcRTH, 'recentstatus');
+                            var sumRTH = summarizeArray(colRTH.features[0].properties.recentstatusVals);
+                            strPopup += "<br>Hawks<br>&nbsp;&nbsp;Red-tail Hawk";
+                            for (var i=0;i<sumRTH[0].length;i++) {
+                                strPopup += "<br>&nbsp;&nbsp;&nbsp;&nbsp;"+sumRTH[0][i]+": "+sumRTH[1][i];
+                            }
+                            
+                            var arSWH = returnLayersByAttribute(lyrRaptorNests, 'recentspecies', 'Swainsons Hawk');
+                            var fcSWH = L.featureGroup(arSWH).toGeoJSON();
+                            var colSWH = summarizePointsByLine(line, 0.533, fcSWH, 'recentstatus');
+                            var sumSWH = summarizeArray(colSWH.features[0].properties.recentstatusVals);
+                            strPopup += "<br>Hawks<br>&nbsp;&nbsp;Swainsons Hawk";
+                            for (var i=0;i<sumSWH[0].length;i++) {
+                                strPopup += "<br>&nbsp;&nbsp;&nbsp;&nbsp;"+sumSWH[0][i]+": "+sumSWH[1][i];
+                            }
+                            
                             fgpDrawnItems.addLayer(e.layer.bindPopup(strPopup));
                             e.layer.openPopup();
                             break;
