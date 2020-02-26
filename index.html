@@ -424,15 +424,23 @@
                             
                             var bufLine = turf.buffer(line, 0.05, 'kilometers');
                             var intBUOWL = intersectPolyByPolyFC(bufLine, lyrBUOWL.toGeoJSON());
+                            var intBUOWLline = intersectLineByPolyFC(line, lyrBUOWLbuffer.toGeoJSON());
                             
                             L.geoJSON(intBUOWL, {style:{color:'red', weight:5}}).addTo(map);
+                            L.geoJSON(intBUOWLline, {style:{color:'red', weight:5}}).addTo(map);
                             
                             var arBUOWLsummary = summarizePolyFC(intBUOWL, 'hist_occup');
                             strPopup += "<br>BUOWL<br>&nbsp;&nbsp;Direct Impacts";
                             for (var i=0;i<arBUOWLsummary[0].length;i++) {
-                                strPopup += "<br>&nbsp;&nbsp;&nbsp;&nbsp;"+arBUOWLsummary[0][i]+": "+arBUOWLsummary[1][i]+" ("+(arBUOWLsummary[2][i]/4046.9).toFixed(1)+")";
+                                strPopup += "<br>&nbsp;&nbsp;&nbsp;&nbsp;"+arBUOWLsummary[0][i]+": "+arBUOWLsummary[1][i]+" ("+(arBUOWLsummary[2][i]/4046.9).toFixed(1)+" acres)";
                             }
                             
+                            var arBUOWLsummary = summarizeLineFC(intBUOWLline, 'hist_occup');
+                            console.log(arBUOWLsummary);
+                            strPopup += "<br>BUOWL<br>&nbsp;&nbsp;Indirect Impacts";
+                            for (var i=0;i<arBUOWLsummary[0].length;i++) {
+                                strPopup += "<br>&nbsp;&nbsp;&nbsp;&nbsp;"+arBUOWLsummary[0][i]+": "+arBUOWLsummary[1][i]+" ("+(arBUOWLsummary[2][i]).toFixed(3)+" km)";
+                            }
                             
                             fgpDrawnItems.addLayer(e.layer.bindPopup(strPopup));
                             e.layer.openPopup();
@@ -897,6 +905,27 @@
                 return turf.featureCollection(fgp);
             }
             
+            function intersectLineByPolyFC(line, fcPoly) {
+                var fgp = [];
+                var bbLine = turf.bboxPolygon(turf.bbox(line));
+                for (var i=0;i<fcPoly.features.length;i++) {
+                    var bb = turf.bboxPolygon(turf.bbox(fcPoly.features[i]));
+                    if (turf.intersect(bbLine, bb)) {
+                        var slc = turf.lineSplit(line, fcPoly.features[i]);
+                        for (var j=0;j<slc.features.length;j++) {
+                            var curSlc = slc.features[j];
+                            var len = turf.lineDistance(curSlc, 'kilometers');
+                            var ptMiddle = turf.along(curSlc, len/2, 'kilometers');
+                            if (turf.inside(ptMiddle, fcPoly.features[i])) {
+                                curSlc.properties = fcPoly.features[i].properties;
+                                fgp.push(curSlc);
+                            }
+                        }
+                    }
+                }
+                return turf.featureCollection(fgp);
+            }
+            
             function summarizeArray(ar) {
                 var arUnique = [];
                 var arCount = [];
@@ -929,6 +958,28 @@
                     }
                 }
                 return [arUnique, arCount, arArea];
+            }
+            
+            function summarizeLineFC(fcLine, att) {
+                console.log(fcLine);
+                var arUnique = [];
+                var arCount = [];
+                var arLength = [];
+                for (var i=0;i<fcLine.features.length;i++) {
+                    var curAtt = fcLine.features[i].properties[att];
+                    var idx = arUnique.indexOf(curAtt);
+                    console.log(curAtt);
+                    console.log(idx);
+                    if (idx<0) {
+                        arUnique.push(curAtt);
+                        arCount.push(1);
+                        arLength.push(turf.lineDistance(fcLine.features[i]));
+                    } else {
+                        arCount[idx] = arCount[idx]+1;
+                        arLength[idx] = arLength[idx]+turf.lineDistance(fcLine.features[i]);
+                    }
+                }
+                return [arUnique, arCount, arLength];
             }
             
         </script>
