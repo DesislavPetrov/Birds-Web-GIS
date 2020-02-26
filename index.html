@@ -427,6 +427,13 @@
                             
                             L.geoJSON(intBUOWL, {style:{color:'red', weight:5}}).addTo(map);
                             
+                            var arBUOWLsummary = summarizePolyFC(intBUOWL, 'hist_occup');
+                            strPopup += "<br>BUOWL<br>&nbsp;&nbsp;Direct Impacts";
+                            for (var i=0;i<arBUOWLsummary[0].length;i++) {
+                                strPopup += "<br>&nbsp;&nbsp;&nbsp;&nbsp;"+arBUOWLsummary[0][i]+": "+arBUOWLsummary[1][i]+" ("+(arBUOWLsummary[2][i]/4046.9).toFixed(1)+")";
+                            }
+                            
+                            
                             fgpDrawnItems.addLayer(e.layer.bindPopup(strPopup));
                             e.layer.openPopup();
                             break;
@@ -903,6 +910,25 @@
                     }
                 }
                 return [arUnique, arCount];
+            }
+            
+            function summarizePolyFC(fcPoly, att) {
+                var arUnique = [];
+                var arCount = [];
+                var arArea = [];
+                for (var i=0;i<fcPoly.features.length;i++) {
+                    var curAtt = fcPoly.features[i].properties[att];
+                    var idx = arUnique.indexOf(curAtt);
+                    if (idx<0) {
+                        arUnique.push(curAtt);
+                        arCount.push(1);
+                        arArea.push(turf.area(fcPoly.features[i]));
+                    } else {
+                        arCount[idx] = arCount[idx]+1
+                        arArea[idx] = arArea[idx]+turf.area(fcPoly.features[i])
+                    }
+                }
+                return [arUnique, arCount, arArea];
             }
             
         </script>
