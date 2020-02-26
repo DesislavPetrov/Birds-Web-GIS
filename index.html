@@ -402,9 +402,9 @@
                             var strPopup = "Eagles";
                             for (var i=0;i<sumEagle[0].length;i++) {
                                 strPopup += "<br> "+sumEagle[0][i]+": "+sumEagle[1][i];
-                            }                           
+                            }
                             
-                           var arRTH = returnLayersByAttribute(lyrRaptorNests, 'recentspecies', 'Red-tail Hawk');
+                            var arRTH = returnLayersByAttribute(lyrRaptorNests, 'recentspecies', 'Red-tail Hawk');
                             var fcRTH = L.featureGroup(arRTH).toGeoJSON();
                             var colRTH = summarizePointsByLine(line, 0.533, fcRTH, 'recentstatus');
                             var sumRTH = summarizeArray(colRTH.features[0].properties.recentstatusVals);
@@ -421,6 +421,11 @@
                             for (var i=0;i<sumSWH[0].length;i++) {
                                 strPopup += "<br>&nbsp;&nbsp;&nbsp;&nbsp;"+sumSWH[0][i]+": "+sumSWH[1][i];
                             }
+                            
+                            var bufLine = turf.buffer(line, 0.05, 'kilometers');
+                            var intBUOWL = intersectPolyByPolyFC(bufLine, lyrBUOWL.toGeoJSON());
+                            
+                            L.geoJSON(intBUOWL, {style:{color:'red', weight:5}}).addTo(map);
                             
                             fgpDrawnItems.addLayer(e.layer.bindPopup(strPopup));
                             e.layer.openPopup();
@@ -867,6 +872,22 @@
                 buf = turf.featureCollection([buf]);
                 buf = turf.collect(buf, fcPoint, prop, prop+"Vals");
                 return buf;
+            }
+            
+            function intersectPolyByPolyFC(poly, fcPoly) {
+                var fgp = [];
+                var bbPoly = turf.bboxPolygon(turf.bbox(poly));
+                for (var i=0;i<fcPoly.features.length;i++) {
+                    var bb = turf.bboxPolygon(turf.bbox(fcPoly.features[i]));
+                    if (turf.intersect(bbPoly, bb)) {
+                        var int = turf.intersect(poly, fcPoly.features[i]);
+                        if (int) {
+                            int.properties = fcPoly.features[i].properties;
+                            fgp.push(int);
+                        }
+                    }
+                }
+                return turf.featureCollection(fgp);
             }
             
             function summarizeArray(ar) {
